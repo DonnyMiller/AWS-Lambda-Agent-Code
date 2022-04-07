@@ -1,0 +1,20 @@
+import json
+import urllib3
+import io
+
+def lambda_handler(event, context):
+    # TODO implement
+    http = urllib3.PoolManager()
+    s = json.dumps(event['Details']['ContactData']['CustomerEndpoint']['Address'])
+    areaCode = s[3:6]
+    
+    
+    r = http.request('POST', 'http://www.telcodata.us/query/queryexchangexml.html?post', {'npa':areaCode, 'nxx':'300'})
+    b = "".join(map(chr, r.data)) #convert bytes to string
+    buf = io.StringIO(b)
+    for x in range(0, 11):
+        state = buf.readline()
+
+    return {
+        'state': state[9:11]
+    }
